@@ -94,7 +94,7 @@ mod tests {
             fullname: "a b".to_string(),
             password: "password".to_string(),
         };
-        let ret = User::create(&user, &db.pool).await?;
+        let ret = User::create(&user, &db).await?;
         assert_eq!(user.email, ret.email);
         assert_eq!(user.fullname, ret.fullname);
         assert!(ret.id > 0);

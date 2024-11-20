@@ -2,6 +2,7 @@ mod app;
 mod config;
 
 mod error;
+mod handlers;
 mod models;
 
 pub use app::*;
@@ -14,11 +15,19 @@ pub mod test {
     use dotenvy::dotenv;
     use sqlx::{Pool, Postgres};
     use sqlx_db_tester::TestPg;
-    use std::path::Path;
+    use std::{ops::Deref, path::Path};
 
     pub struct TestDb {
         _tdb: TestPg, // 保持 TestPg 活着
         pub pool: Pool<Postgres>,
+    }
+
+    impl Deref for TestDb {
+        type Target = Pool<Postgres>;
+
+        fn deref(&self) -> &Self::Target {
+            &self.pool
+        }
     }
 
     // 这里如果直接返回pool会出现问题， tdb会被销毁， 连接就会被断开，所以需要返回一个struct 来保持 tdb 活着

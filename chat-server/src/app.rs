@@ -1,8 +1,11 @@
 use std::{ops::Deref, sync::Arc};
 
-use axum::Router;
+use axum::{routing::post, Router};
 
-use crate::AppConfig;
+use crate::{
+    handlers::{signin_handler, signup_handler},
+    AppConfig,
+};
 
 #[derive(Debug, Clone)]
 pub(crate) struct AppState {
@@ -17,7 +20,9 @@ pub(crate) struct AppStateInner {
 pub fn get_router(config: AppConfig) -> Router {
     let state = AppState::new(config);
 
-    let api = Router::new();
+    let api = Router::new()
+        .route("/signup", post(signup_handler))
+        .route("/signin", post(signin_handler));
 
     Router::new().nest("/api", api).with_state(state)
 }

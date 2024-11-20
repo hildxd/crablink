@@ -1,0 +1,19 @@
+@baseUrl = http://localhost:7070/api
+
+### Sign Up Request
+POST {{baseUrl}}/signup
+Content-Type: application/json
+
+{
+    "username": "testuser",
+    "password": "testpassword"
+}
+
+### Sign In Request
+POST {{baseUrl}}/signin
+Content-Type: application/json
+
+{
+    "username": "testuser",
+    "password": "testpassword"
+}
