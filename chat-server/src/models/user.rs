@@ -73,7 +73,7 @@ fn verify_password(password: &str, password_hash: &str) -> Result<bool, AppError
 
 #[cfg(test)]
 mod tests {
-    use crate::test::create_test_pool;
+    use crate::utils::create_test_pool;
 
     use super::*;
 
