@@ -73,10 +73,7 @@ fn verify_password(password: &str, password_hash: &str) -> Result<bool, AppError
 
 #[cfg(test)]
 mod tests {
-    use std::path::Path;
-
-    use dotenvy::dotenv;
-    use sqlx_db_tester::TestPg;
+    use crate::test::create_test_pool;
 
     use super::*;
 
@@ -90,17 +87,14 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn create_and_verify_user_should_work() -> Result<()> {
-        dotenv().ok();
-        let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
-        let tdb = TestPg::new(database_url, Path::new("../migrations"));
-        let pool = tdb.get_pool().await;
+    async fn create_and_verify_user_should_work<'a>() -> Result<()> {
+        let db = create_test_pool().await?;
         let user = CreateUser {
             email: "a@b.com".to_string(),
             fullname: "a b".to_string(),
             password: "password".to_string(),
         };
-        let ret = User::create(&user, &pool).await?;
+        let ret = User::create(&user, &db.pool).await?;
         assert_eq!(user.email, ret.email);
         assert_eq!(user.fullname, ret.fullname);
         assert!(ret.id > 0);
