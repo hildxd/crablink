@@ -7,4 +7,7 @@ pub enum AppError {
 
     #[error("password hash error: {0}")]
     HashPasswordError(#[from] argon2::password_hash::Error),
+
+    #[error("jwt error: {0}")]
+    JwtError(#[from] jwt_simple::Error),
 }
