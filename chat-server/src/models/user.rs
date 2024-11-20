@@ -87,7 +87,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn create_and_verify_user_should_work<'a>() -> Result<()> {
+    async fn create_and_verify_user_should_work() -> Result<()> {
         let db = create_test_pool().await?;
         let user = CreateUser {
             email: "a@b.com".to_string(),

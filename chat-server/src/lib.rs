@@ -21,6 +21,7 @@ pub mod test {
         pub pool: Pool<Postgres>,
     }
 
+    // 这里如果直接返回pool会出现问题， tdb会被销毁， 连接就会被断开，所以需要返回一个struct 来保持 tdb 活着
     pub async fn create_test_pool() -> Result<TestDb> {
         dotenv().ok();
         let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
