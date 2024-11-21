@@ -308,6 +308,7 @@ dependencies = [
  "axum",
  "chrono",
  "dotenvy",
+ "http-body-util",
  "jwt-simple",
  "serde",
  "serde_yaml",

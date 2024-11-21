@@ -67,9 +67,10 @@ impl AppState {
     ) -> Result<(sqlx_db_tester::TestPg, Self), AppError> {
         let pk = DecodingKey::load(&config.auth.pk).context("load pk failed")?;
         let sk = EncodingKey::load(&config.auth.sk).context("load sk failed")?;
-        let db_url = config.server.db_url.split("/").next().unwrap();
-        let tdb =
-            sqlx_db_tester::TestPg::new(db_url.to_string(), std::path::Path::new("../migrations"));
+        let tdb = sqlx_db_tester::TestPg::new(
+            config.server.db_url.clone(),
+            std::path::Path::new("../migrations"),
+        );
         let pool = tdb.get_pool().await;
         let state = Self {
             inner: Arc::new(AppStateInner {

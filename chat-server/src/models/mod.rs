@@ -15,11 +15,21 @@ pub struct User {
     pub created_at: DateTime<Utc>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct CreateUser {
     pub fullname: String,
     pub email: String,
     pub password: String,
+}
+
+impl CreateUser {
+    pub fn new(fullname: &str, email: &str, password: &str) -> Self {
+        Self {
+            fullname: fullname.to_string(),
+            email: email.to_string(),
+            password: password.to_string(),
+        }
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -37,6 +47,16 @@ impl User {
             email: email.to_string(),
             password_hash: Default::default(),
             created_at: Utc::now(),
+        }
+    }
+}
+
+#[cfg(test)]
+impl VerifyUser {
+    pub fn new(email: &str, password: &str) -> Self {
+        Self {
+            email: email.to_string(),
+            password: password.to_string(),
         }
     }
 }

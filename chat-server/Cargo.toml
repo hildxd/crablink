@@ -21,4 +21,5 @@ tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
 
 [dev-dependencies]
+http-body-util = "0.1.2"
 sqlx-db-tester = "0.5.0"

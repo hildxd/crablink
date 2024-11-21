@@ -8,6 +8,8 @@ use thiserror::Error;
 
 #[derive(Error, Debug)]
 pub enum AppError {
+    #[error("email is exist: {0}")]
+    EmailIsExist(String),
     #[error("sql error: {0}")]
     SqlxError(#[from] sqlx::Error),
 
@@ -34,6 +36,7 @@ impl ErrorOutput {
 impl IntoResponse for AppError {
     fn into_response(self) -> Response<axum::body::Body> {
         let status = match &self {
+            Self::EmailIsExist(_) => StatusCode::CONFLICT,
             Self::HashPasswordError(_) => StatusCode::UNPROCESSABLE_ENTITY,
             Self::SqlxError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             Self::JwtError(_) => StatusCode::FORBIDDEN,

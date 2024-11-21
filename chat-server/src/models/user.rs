@@ -19,8 +19,12 @@ impl User {
             .map_err(Into::into)
     }
 
-    pub async fn create(user: &CreateUser, pool: &PgPool) -> Result<Self, AppError> {
-        let password_hash = hash_password(&user.password)?;
+    pub async fn create(dto: &CreateUser, pool: &PgPool) -> Result<Self, AppError> {
+        let user = Self::find_by_email(&dto.email, &pool).await;
+        if user.is_err() {
+            return Err(AppError::EmailIsExist(dto.email.clone()));
+        }
+        let password_hash = hash_password(&dto.password)?;
         let user = sqlx::query_as(
             r#"
             INSERT INTO users (email, fullname, password_hash)
@@ -28,8 +32,8 @@ impl User {
             RETURNING id, fullname, email, created_at
             "#,
         )
-        .bind(&user.email)
-        .bind(&user.fullname)
+        .bind(&dto.email)
+        .bind(&dto.fullname)
         .bind(&password_hash)
         .fetch_one(pool)
         .await?;
@@ -37,7 +41,10 @@ impl User {
     }
 
     pub async fn verify(dto: &VerifyUser, pool: &PgPool) -> Result<Option<Self>, AppError> {
-        let user = Self::find_by_email(&dto.email, pool).await?;
+        let user: Option<User> = sqlx::query_as("SELECT id, fullname, email, password_hash, created_at FROM users WHERE email = $1")
+            .bind(&dto.email)
+            .fetch_optional(pool)
+            .await?;
         match user {
             Some(mut user) => {
                 let password_hash = mem::take(&mut user.password_hash);
