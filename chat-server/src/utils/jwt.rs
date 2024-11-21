@@ -1,7 +1,7 @@
-use std::ops::Deref;
+use std::{fmt::Debug, ops::Deref};
 
 use anyhow::Result;
-use jwt_simple::{claims, prelude::*};
+use jwt_simple::prelude::*;
 
 use crate::{models::User, AppError};
 
@@ -10,6 +10,8 @@ const JWT_ISS: &str = "chat_server";
 const JWT_AUD: &str = "chat_web";
 
 pub struct EncodingKey(Ed25519KeyPair);
+
+#[derive(Debug)]
 pub struct DecodingKey(Ed25519PublicKey);
 
 impl EncodingKey {
@@ -52,6 +54,12 @@ impl Deref for DecodingKey {
     type Target = Ed25519PublicKey;
     fn deref(&self) -> &Self::Target {
         &self.0
+    }
+}
+
+impl Debug for EncodingKey {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("EncodingKey").finish()
     }
 }
 

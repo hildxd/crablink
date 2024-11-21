@@ -1,10 +1,13 @@
 use std::{ops::Deref, sync::Arc};
 
+use anyhow::{Context, Result};
 use axum::{routing::post, Router};
+use sqlx::PgPool;
 
 use crate::{
     handlers::{signin_handler, signup_handler},
-    AppConfig,
+    utils::{DecodingKey, EncodingKey},
+    AppConfig, AppError,
 };
 
 #[derive(Debug, Clone)]
@@ -15,16 +18,20 @@ pub(crate) struct AppState {
 #[derive(Debug)]
 pub(crate) struct AppStateInner {
     pub(crate) config: AppConfig,
+    pub(crate) pk: DecodingKey,
+    pub(crate) sk: EncodingKey,
+    pub(crate) pool: PgPool,
 }
 
-pub fn get_router(config: AppConfig) -> Router {
-    let state = AppState::new(config);
+pub async fn get_router(config: AppConfig) -> Result<Router, AppError> {
+    let state = AppState::new(config).await?;
 
     let api = Router::new()
         .route("/signup", post(signup_handler))
         .route("/signin", post(signin_handler));
 
-    Router::new().nest("/api", api).with_state(state)
+    let app = Router::new().nest("/api", api).with_state(state);
+    Ok(app)
 }
 
 impl Deref for AppState {
@@ -36,9 +43,42 @@ impl Deref for AppState {
 }
 
 impl AppState {
-    pub(crate) fn new(config: AppConfig) -> Self {
-        Self {
-            inner: Arc::new(AppStateInner { config }),
-        }
+    pub(crate) async fn new(config: AppConfig) -> Result<Self, AppError> {
+        let pk = DecodingKey::load(&config.auth.pk).context("load pk failed")?;
+        let sk = EncodingKey::load(&config.auth.sk).context("load sk failed")?;
+        let pool = PgPool::connect(&config.server.db_url)
+            .await
+            .context("connect to db failed")?;
+        Ok(Self {
+            inner: Arc::new(AppStateInner {
+                config,
+                pk,
+                sk,
+                pool,
+            }),
+        })
+    }
+}
+
+#[cfg(test)]
+impl AppState {
+    pub(crate) async fn new_for_test(
+        config: AppConfig,
+    ) -> Result<(sqlx_db_tester::TestPg, Self), AppError> {
+        let pk = DecodingKey::load(&config.auth.pk).context("load pk failed")?;
+        let sk = EncodingKey::load(&config.auth.sk).context("load sk failed")?;
+        let db_url = config.server.db_url.split("/").next().unwrap();
+        let tdb =
+            sqlx_db_tester::TestPg::new(db_url.to_string(), std::path::Path::new("../migrations"));
+        let pool = tdb.get_pool().await;
+        let state = Self {
+            inner: Arc::new(AppStateInner {
+                config,
+                pk,
+                sk,
+                pool,
+            }),
+        };
+        Ok((tdb, state))
     }
 }
