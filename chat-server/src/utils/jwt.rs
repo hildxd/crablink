@@ -31,6 +31,7 @@ impl DecodingKey {
         Ok(Self(Ed25519PublicKey::from_pem(pem)?))
     }
 
+    #[allow(unused)]
     pub fn verify(&self, token: &str) -> Result<User, AppError> {
         let opts = VerificationOptions {
             allowed_audiences: Some(HashSet::from_strings(&[JWT_AUD])),

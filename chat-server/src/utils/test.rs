@@ -1,10 +1,7 @@
 #[cfg(test)]
 pub mod utils {
     use anyhow::Result;
-    use axum::{
-        body::{Body, Bytes},
-        response::Response,
-    };
+    use axum::{body::Body, response::Response};
     use dotenvy::dotenv;
     use jwt_simple::reexports::serde_json;
 
@@ -39,7 +36,7 @@ pub mod utils {
     // for<'de> 就像是告诉编译器："别担心，这个类型可以处理任何生命周期的输入"
     pub async fn parser_response<T>(res: Response<Body>) -> Result<T>
     where
-        T: for<'de> Deserialize<'de>
+        T: for<'de> Deserialize<'de>,
     {
         let body = res.into_body().collect().await?.to_bytes();
         let ret = serde_json::from_slice::<T>(&body)?;

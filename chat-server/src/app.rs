@@ -16,6 +16,7 @@ pub(crate) struct AppState {
 }
 
 #[derive(Debug)]
+#[allow(unused)]
 pub(crate) struct AppStateInner {
     pub(crate) config: AppConfig,
     pub(crate) pk: DecodingKey,

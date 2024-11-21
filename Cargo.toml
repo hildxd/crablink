@@ -1,6 +1,9 @@
 [workspace]
-members = ["chat-server"]
+members = [ "chat-notify","chat-server"]
 resolver = "2"
+
+package.license = "MIT"
+
 
 [workspace.dependencies]
 anyhow = "1.0.93"

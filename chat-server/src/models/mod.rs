@@ -22,6 +22,7 @@ pub struct CreateUser {
     pub password: String,
 }
 
+#[cfg(test)]
 impl CreateUser {
     pub fn new(fullname: &str, email: &str, password: &str) -> Self {
         Self {

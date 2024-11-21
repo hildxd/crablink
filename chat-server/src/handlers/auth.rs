@@ -13,7 +13,7 @@ pub struct AuthOutput {
     token: String,
 }
 
-#[axum::debug_handler]
+#[allow(unused_variables)]
 pub(crate) async fn signin_handler(
     State(state): State<AppState>,
     Json(input): Json<VerifyUser>,
@@ -48,7 +48,7 @@ mod tests {
     use super::*;
 
     #[tokio::test]
-    async fn signup_handler_should_work() -> Result<()> {
+    async fn test_signup_success() -> Result<()> {
         let config = AppConfig::load()?;
         let (_tdb, state) = AppState::new_for_test(config).await?;
         let input = CreateUser::new("hildxd", "hildxd@qq.com", "password");
@@ -63,7 +63,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn signin_handler_should_work() -> Result<()> {
+    async fn test_signin_success() -> Result<()> {
         let config = AppConfig::load()?;
         let (_tdb, state) = AppState::new_for_test(config).await?;
         let input = CreateUser::new("hildxd", "hildxd@qq.com", "password");
@@ -80,7 +80,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn signin_handler_should_return_403_when_password_is_wrong() -> Result<()> {
+    async fn test_signin_fails_with_wrong_password() -> Result<()> {
         let config = AppConfig::load()?;
         let (_tdb, state) = AppState::new_for_test(config).await?;
         let input = CreateUser::new("hildxd", "hildxd@qq.com", "password");
@@ -90,12 +90,12 @@ mod tests {
         let ret = signin_handler(State(state), Json(input))
             .await?
             .into_response();
-        assert_eq!(ret.status(), StatusCode::FORBIDDEN);    
+        assert_eq!(ret.status(), StatusCode::FORBIDDEN);
         Ok(())
     }
 
     #[tokio::test]
-    async fn signup_handler_should_return_409_when_email_is_exist() -> Result<()> {
+    async fn test_signup_fails_with_duplicate_email() -> Result<()> {
         let config = AppConfig::load()?;
         let (_tdb, state) = AppState::new_for_test(config).await?;
         let input = CreateUser::new("hildxd", "email@qq.com", "password");
@@ -111,7 +111,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn signin_handler_should_return_403_when_email_is_not_exist() -> Result<()> {
+    async fn test_signin_fails_with_nonexistent_email() -> Result<()> {
         let config = AppConfig::load()?;
         let (_tdb, state) = AppState::new_for_test(config).await?;
         let input = CreateUser::new("hildxd", "email@qq.com", "password");
