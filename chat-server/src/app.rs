@@ -1,11 +1,16 @@
 use std::{ops::Deref, sync::Arc};
 
 use anyhow::{Context, Result};
-use axum::{routing::post, Router};
+use axum::{
+    middleware::from_fn_with_state,
+    routing::{get, post},
+    Router,
+};
 use sqlx::PgPool;
 
 use crate::{
     handlers::{signin_handler, signup_handler},
+    middlewares::{set_layer, verify_token},
     utils::{DecodingKey, EncodingKey},
     AppConfig, AppError,
 };
@@ -28,11 +33,13 @@ pub async fn get_router(config: AppConfig) -> Result<Router, AppError> {
     let state = AppState::new(config).await?;
 
     let api = Router::new()
+        .route("/chat", get(|| async { "chat" }))
+        .layer(from_fn_with_state(state.clone(), verify_token))
         .route("/signup", post(signup_handler))
         .route("/signin", post(signin_handler));
 
     let app = Router::new().nest("/api", api).with_state(state);
-    Ok(app)
+    Ok(set_layer(app))
 }
 
 impl Deref for AppState {

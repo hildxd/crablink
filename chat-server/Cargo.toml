@@ -10,6 +10,7 @@ license = "MIT"
 anyhow = { workspace = true }
 argon2 = { version = "0.5.3", features = ["std"] }
 axum = { workspace = true }
+axum-extra = { version = "0.9.6", features = ["typed-header"] }
 chrono = {version = "0.4.38", features = ["serde"]}
 dotenvy = "0.15"
 jwt-simple = {version = "0.12.10", features = ["pure-rust"], default-features = false}
@@ -18,8 +19,11 @@ serde_yaml = { workspace = true }
 sqlx = { workspace = true }
 thiserror = { workspace = true }
 tokio = { workspace = true }
+tower = "0.5.1"
+tower-http = { version = "0.6.2", features = ["compression-full", "request-id", "trace"] }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
+uuid = { version = "1.11.0", features = ["v7"] }
 
 [dev-dependencies]
 http-body-util = "0.1.2"

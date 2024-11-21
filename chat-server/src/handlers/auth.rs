@@ -13,13 +13,11 @@ pub struct AuthOutput {
     token: String,
 }
 
-#[allow(unused_variables)]
 pub(crate) async fn signin_handler(
     State(state): State<AppState>,
     Json(input): Json<VerifyUser>,
 ) -> Result<impl IntoResponse, AppError> {
     let user = User::verify(&input, &state.pool).await?;
-
     match user {
         Some(user) => {
             let token = state.sk.sign(user)?;

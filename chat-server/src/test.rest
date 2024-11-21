@@ -1,19 +1,31 @@
 @baseUrl = http://localhost:7070/api
 
 ### Sign Up Request
+## @name signup
 POST {{baseUrl}}/signup
 Content-Type: application/json
 
 {
-    "username": "testuser",
+    "fullname": "testuser",
+    "email": "testuser@example.com",
     "password": "testpassword"
 }
 
+
+
 ### Sign In Request
+# @name signin
 POST {{baseUrl}}/signin
 Content-Type: application/json
 
 {
-    "username": "testuser",
+    "email": "testuser@example.com",
     "password": "testpassword"
 }
+
+@token = {{signin.response.body.token}}
+
+
+### Chat Request
+GET {{baseUrl}}/chat
+Authorization: Bearer {{token}}
